@@ -20,3 +20,10 @@ C:\Users\katok\source\repos\CeVIO_AI_時報\CeVIO_AI_時報\obj\Debug\CeVIO_AI_�
 C:\Users\katok\source\repos\CeVIO_AI_時報\CeVIO_AI_時報\obj\Debug\CeVIO_AI.7C0C7AB1.Up2Date
 C:\Users\katok\source\repos\CeVIO_AI_時報\CeVIO_AI_時報\obj\Debug\CeVIO_AI_時報.exe
 C:\Users\katok\source\repos\CeVIO_AI_時報\CeVIO_AI_時報\obj\Debug\CeVIO_AI_時報.pdb
+C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\obj\Debug\CeVIO_AI_時報.csproj.AssemblyReference.cache
+C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\obj\Debug\CeVIO_AI_時報.Form1.resources
+C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\obj\Debug\CeVIO_AI_時報.Properties.Resources.resources
+C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\obj\Debug\CeVIO_AI_時報.csproj.GenerateResource.cache
+C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\obj\Debug\CeVIO_AI_時報.csproj.CoreCompileInputs.cache
+C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\obj\Debug\CeVIO_AI_時報.exe
+C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\obj\Debug\CeVIO_AI_時報.pdb
