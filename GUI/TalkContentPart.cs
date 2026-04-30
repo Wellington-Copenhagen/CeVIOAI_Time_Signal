@@ -1,9 +1,11 @@
 ﻿using CeVIO.Talk.RemoteService2;
+using CeVIO_AI_時報.ProcessUnit;
 using CeVIO_AI_時報.UI_Component;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -11,73 +13,177 @@ using System.Windows.Forms;
 namespace CeVIO_AI_時報.GUI
 {
     // 400x400の大きさ
-    internal class GUI_TalkContentPart : GUI_Part
+    internal class GUI_TalkContentPart : GUIPart
     {
-        public List<EmotionGauge> emotionGauges;
-        public VoicePropertyGauge volumeGauge;
-        public VoicePropertyGauge speedGauge;
-        public VoicePropertyGauge toneGauge;
-        public VoicePropertyGauge alphaGauge;
-        public VoicePropertyGauge toneScaleGauge;
-        public TextBox contentTextBox;
-        public ListBox castsListBox;
-        public Action OnChanged;
-        public GUI_TalkContentPart(Point location)
+        TalkContent _talkContent;
+        List<EmotionGauge> _emotionGauges = new List<EmotionGauge>();
+        List<VoicePropertyGauge> _voicePropertyGauges = new List<VoicePropertyGauge>();
+        TextBox _contentTextBox;
+        ListBox _castsListBox;
+        Button _testTalkButton;
+        Label _contentTextboxLabel;
+        public GUI_TalkContentPart()
         {
-            volumeGauge = new VoicePropertyGauge(location + new Size(0, 0), new Volume());
-            volumeGauge.OnValueChanged += () => OnChanged?.Invoke();
-            speedGauge = new VoicePropertyGauge(location + new Size(50, 0), new Speed());
-            speedGauge.OnValueChanged += () => OnChanged?.Invoke();
-            toneGauge = new VoicePropertyGauge(location + new Size(100, 0), new Tone());
-            toneGauge.OnValueChanged += () => OnChanged?.Invoke();
-            alphaGauge = new VoicePropertyGauge(location + new Size(150, 0), new Alpha());
-            alphaGauge.OnValueChanged += () => OnChanged?.Invoke();
-            toneScaleGauge = new VoicePropertyGauge(location + new Size(200, 0), new ToneScale());
-            toneScaleGauge.OnValueChanged += () => OnChanged?.Invoke();
+            for(int i = 0;i < 5; i++)
+            {
+                _voicePropertyGauges.Add(new VoicePropertyGauge(new Point(10 + 50 * i, 20), this));
+                _voicePropertyGauges.Last().OnValueChanged += () => OnChangedByUser?.Invoke();
+            }
             for (int i = 0; i < 5; i++)
             {
-                emotionGauges.Add(new EmotionGauge(location + new Size(50 * i, 90)));
-                emotionGauges.Last().OnValueChanged += () => OnChanged?.Invoke();
+                _emotionGauges.Add(new EmotionGauge(new Point(10 + 50 * i, 110), this));
+                _emotionGauges.Last().OnValueChanged += () => OnChangedByUser?.Invoke();
             }
 
-            castsListBox = new ListBox();
-            castsListBox.Location = location + new Size(250, 0);
-            castsListBox.Size = new Size(150, 180);
-            castsListBox.SelectedIndexChanged += (sender, e) =>
+            _testTalkButton = new Button();
+            _testTalkButton.Text = "試聴";
+            _testTalkButton.Location = new Point(260, 20);
+            _testTalkButton.Size = new Size(70, 30);
+            _testTalkButton.Click += OnTestTalkClicked;
+            Controls.Add(_testTalkButton);
+
+            _castsListBox = new ListBox();
+            _castsListBox.Location = new Point(260, 50);
+            _castsListBox.Size = new Size(150, 150);
+            _castsListBox.SelectedIndexChanged += (sender, e) =>
             {
-                OnChanged?.Invoke();
-                OnCastChanged();
+                OnChangedByUser?.Invoke();
             };
+            Controls.Add(_castsListBox);
 
+            _contentTextboxLabel = new Label();
+            _contentTextboxLabel.Location = new Point(10, 200);
+            _contentTextboxLabel.Size = new Size(100, 20);
+            _contentTextboxLabel.Text = "話す内容";
+            Controls.Add(_contentTextboxLabel);
 
-            contentTextBox = new TextBox();
-            contentTextBox.Location = location + new Size(0, 180);
-            contentTextBox.Size = new Size(400, 220);
-            contentTextBox.TextChanged += (sender, e) => OnChanged?.Invoke();
-        }
-        public void OnCeVIOLoad()
-        {
-            List<string> castNames = Talker2.AvailableCasts.ToList();
-            foreach (string castName in castNames)
-            {
-                castsListBox.Items.Add(castName);
-            }
-            UpdateEmotionLabel();
+            _contentTextBox = new TextBox();
+            _contentTextBox.Location = new Point(10, 220);
+            _contentTextBox.Multiline = true;
+            _contentTextBox.Size = new Size(400, 160);
+            _contentTextBox.TextChanged += (sender, e) => OnChangedByUser?.Invoke();
+            Controls.Add(_contentTextBox);
+
+            Disable();
         }
         public void UpdateEmotionLabel()
         {
             if (ServiceControl2.IsHostStarted)
             {
-                Talker2 talker2 = new Talker2(castsListBox.SelectedItem.ToString());
+                Talker2 talker2 = new Talker2(_castsListBox.SelectedItem.ToString());
                 for (int i = 0; i < 5; i++)
                 {
-                    emotionGauges[i].SetName(talker2.Components[i].Name);
+                    _emotionGauges[i].SetName(talker2.Components[i].Name);
                 }
             }
         }
-        public void OnCastChanged()
+        protected override void UpdateVisual()
         {
-            UpdateEmotionLabel();
+            if(_talkContent != null)
+            {
+                Enable();
+                for (int i = 0; i < 5; i++)
+                {
+                    if (i < _talkContent.Emotions.Count)
+                    {
+                        _emotionGauges[i].SetValue(_talkContent.Emotions[i], true);
+                    }
+                    else
+                    {
+                        _emotionGauges[i].SetValue(0, false);
+                    }
+                }
+                UpdateEmotionLabel();
+                for (int i = 0; i < 5; i++)
+                {
+                    _voicePropertyGauges[i].SetValue(_talkContent.Properties[i]);
+                }
+                _contentTextBox.Text = _talkContent.Content;
+            }
+            else
+            {
+                Disable();
+            }
+        }
+        protected override void UpdateValue()
+        {
+            if (_talkContent != null)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    _talkContent.Properties[i].Value = _voicePropertyGauges[i].GetValue();
+                }
+                for (int i = 0; i < 5; i++)
+                {
+                    if (i < _talkContent.Emotions.Count)
+                    {
+                        _talkContent.Emotions[i] = _emotionGauges[i].GetValue();
+                    }
+                }
+                _talkContent.Cast = _castsListBox.SelectedItem.ToString();
+                _talkContent.Content = _contentTextBox.Text;
+            }
+        }
+        protected override void InitWithCeVIO()
+        {
+            List<string> castNames = Talker2.AvailableCasts.ToList();
+            foreach (string castName in castNames)
+            {
+                _castsListBox.Items.Add(castName);
+            }
+            if (_castsListBox.Items.Count > 0)
+            {
+                _castsListBox.SelectedIndex = 0;
+            }
+        }
+        public override void Disable()
+        {
+            Enabled = false;
+            for(int i = 0;i < 5;i++)
+            {
+                _emotionGauges[i].Disable();
+            }
+            for (int i = 0; i < 5; i++)
+            {
+                _voicePropertyGauges[i].Disable();
+            }
+            _contentTextBox.Enabled = false;
+            _castsListBox.Enabled = false;
+            _testTalkButton.Enabled = false;
+        }
+        protected override void Enable()
+        {
+            Enabled = true;
+            for (int i = 0; i < 5; i++)
+            {
+                _emotionGauges[i].Enable();
+            }
+            for (int i = 0; i < 5; i++)
+            {
+                _voicePropertyGauges[i].Enable();
+            }
+            _contentTextBox.Enabled = true;
+            _castsListBox.Enabled = true;
+            _testTalkButton.Enabled = true;
+        }
+        public void SetProcessUnit(TalkContent talkContent)
+        {
+            if(_talkContent == talkContent)
+            {
+                return;
+            }
+            _talkContent = talkContent;
+        }
+        protected override bool HasBindingProcessUnit()
+        {
+            return _talkContent != null;
+        }
+        void OnTestTalkClicked(object sender, EventArgs e)
+        {
+            if (_talkContent != null)
+            {
+                _talkContent.OnRun();
+            }
         }
     }
 }

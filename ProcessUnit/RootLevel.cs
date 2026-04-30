@@ -11,23 +11,29 @@ namespace CeVIO_AI_時報.ProcessUnit
 {
     internal class RootLevel : IProcessUnit
     {
-        List<TimeCondition> _timeConditions;
+        public List<TimeCondition> TimeConditions = new List<TimeCondition>();
+        public RootLevel()
+        {
+            Default();
+        }
         public RootLevel(XElement element)
         {
+            Default();
             LoadFromXML(element);
         }
         public void OnRun()
         {
-            foreach (var timeCondition in _timeConditions)
+            foreach (var timeCondition in TimeConditions)
             {
                 timeCondition.OnRun();
             }
         }
         public XElement StoreToXML()
         {
-            XElement element = new XElement("RootLecel");
+            XElement element = new XElement("Root");
+            element.Add(new XElement("Type", "Root"));
             element.Add(new XElement("TimeConditions"));
-            foreach (TimeCondition timeCondition in _timeConditions)
+            foreach (TimeCondition timeCondition in TimeConditions)
             {
                 element.Element("TimeConditions").Add(timeCondition.StoreToXML());
             }
@@ -39,35 +45,18 @@ namespace CeVIO_AI_時報.ProcessUnit
             {
                 throw new Exception();
             }
-            _timeConditions = new List<TimeCondition>();
-            int i = 0;
-            while (element.Element("_" + i.ToString()) == null)
-            {
-                TimeCondition timeCondition = new TimeCondition(element.Element("_" + i.ToString()));
-                _timeConditions.Add(timeCondition);
-            }
             if (element.Element("TimeConditions") != null)
             {
+                TimeConditions = new List<TimeCondition>();
                 foreach (XElement timeCondition in element.Element("TimeConditions").Elements())
                 {
-                    _timeConditions.Add(new TimeCondition(timeCondition));
+                    TimeConditions.Add(new TimeCondition(timeCondition));
                 }
             }
         }
-        public void OnLoadToGUI()
+        public void Default()
         {
-            GUI_Components.rootPart.OnChanged = null;
-            List<IListboxAddDeletableComponent> casted = new List<IListboxAddDeletableComponent>();
-            for (int i = 0; i < _timeConditions.Count; i++)
-            {
-                casted.Add(_timeConditions[i]);
-            }
-            GUI_Components.rootPart.listBox.SetComponents(casted);
-            GUI_Components.rootPart.OnChanged = OnChanged;
-        }
-        void OnChanged()
-        {
-            _timeConditions[GUI_Components.rootPart.listBox.SelectedIndex()].OnLoadToGUI();
+            TimeConditions = new List<TimeCondition>();
         }
     }
 }

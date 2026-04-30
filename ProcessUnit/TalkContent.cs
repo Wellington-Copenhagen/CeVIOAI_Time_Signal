@@ -13,18 +13,18 @@ namespace CeVIO_AI_時報.ProcessUnit
     internal class TalkContent : IProcessUnit, IListboxAddDeletableComponent
     {
         string _name;
-        List<VoiceProperty> proerties;
-        List<uint> _emotions;
-        string _cast;
-        string _content;
+        public List<VoiceProperty> Properties = new List<VoiceProperty>();
+        public List<uint> Emotions;
+        public string Cast;
+        public string Content;
+        public TalkContent()
+        {
+            Default();
+        }
         public TalkContent(XElement element)
         {
+            Default();
             LoadFromXML(element);
-            _volume = new Volume();
-            _speed = new Speed();
-            _tone = new Tone();
-            _alpha = new Alpha();
-            _toneScale = new ToneScale();
         }
         public string GetName()
         {
@@ -36,64 +36,36 @@ namespace CeVIO_AI_時報.ProcessUnit
         }
         public void OnRun()
         {
-            Talker2 talker2 = new Talker2();
-            talker2.Cast = _cast;
-            talker2.Volume = _volume.Value;
-            talker2.Speed = _speed.Value;
-            talker2.Tone = _tone.Value;
-            talker2.Alpha = _alpha.Value;
-            talker2.ToneScale = _toneScale.Value;
-            string parsed = _content;
+            GUI_Components.voiceOutput.Cast = Cast;
+            GUI_Components.voiceOutput.Properties = Properties;
+            GUI_Components.voiceOutput.Emotions = Emotions;
+            GUI_Components.voiceOutput.Content = Content;
+            string parsed = Content;
             ContentParser.Parse(parsed, out string error);
-            for(int i = 0;i < talker2.Components.Count;i++)
-            {
-                talker2.Components[i].Value = _emotions[i];
-            }
-            if (ServiceControl2.IsHostStarted)
-            {
-                talker2.Speak(parsed);
-            }
+            GUI_Components.voiceOutput.Content = parsed;
+            GUI_Components.voiceOutput.AlternativeText = error;
 
-
-            string toShow = "";
-            if (error.Length == 0)
-            {
-                toShow = toShow + "キャスト：" + _cast + "\n";
-                toShow = toShow + "大きさ：" + _volume.ValueString() + "\n";
-                toShow = toShow + "速さ：" + _speed.ValueString() + "\n";
-                toShow = toShow + "高さ：" + _tone.ValueString() + "\n";
-                toShow = toShow + "声質：" + _alpha.ValueString() + "\n";
-                toShow = toShow + "抑揚：" + _toneScale.ValueString() + "\n";
-                toShow = toShow + "感情：";
-                for (int i = 0; i < talker2.Components.Count; i++)
-                {
-                    toShow = toShow + "　" + talker2.Components[i].Name + "：" + _emotions[i].ToString() + "\n";
-                }
-                toShow = toShow + "\n";
-                toShow = toShow + parsed;
-            }
-            else
-            {
-                toShow = error;
-            }
+            GUI_Components.voiceOutput.Talk();
         }
         public XElement StoreToXML()
         {
             XElement element = new XElement("TalkContent");
             element.Add(new XElement("Name", _name));
-            element.Add(new XElement("Volume", _volume));
-            element.Add(new XElement("Speed", _speed));
-            element.Add(new XElement("Tone", _tone));
-            element.Add(new XElement("Alpha", _alpha));
-            element.Add(new XElement("ToneScale", _toneScale));
-            int i = 0;
-            foreach (uint emotion in _emotions)
+            element.Add(new XElement("Type", "Read"));
+            element.Add(new XElement("VoiceProperties"));
+            foreach (VoiceProperty property in Properties)
             {
-                element.Add(new XElement("Emo" + i.ToString(), emotion));
+                element.Element("VoiceProperties").Add(new XElement(property.NameEn(), property.Value));
+            }
+            element.Add(new XElement("Emotions"));
+            int i = 0;
+            foreach (uint emotion in Emotions)
+            {
+                element.Element("Emotions").Add(new XElement("Emotion" + i.ToString(), emotion));
                 i++;
             }
-            element.Add(new XElement("Cast", _cast));
-            element.Add(new XElement("Content", _content));
+            element.Add(new XElement("Cast", Cast));
+            element.Add(new XElement("Content", Content));
             return element;
         }
         public void LoadFromXML(XElement element)
@@ -103,65 +75,71 @@ namespace CeVIO_AI_時報.ProcessUnit
                 throw new Exception();
             }
             _name = element.Element("Name").Value;
-            _volume.Value = uint.Parse(element.Element("Volume").Value);
-            _speed.Value = uint.Parse(element.Element("Speed").Value);
-            _tone.Value = uint.Parse(element.Element("Tone").Value);
-            _alpha.Value = uint.Parse(element.Element("Alpha").Value);
-            _toneScale.Value = uint.Parse(element.Element("ToneScale").Value);
-            _emotions = new List<uint>();
-            int i = 0;
-            while (true)
+            if(element.Element("VoiceProperties") != null)
             {
-                XElement emotionElement = element.Element("Emo" + i.ToString());
-                if (emotionElement == null)
+                for (int i = 0; i < 5; i++)
                 {
-                    break;
+                    if (element.Element("VoiceProperties").Element(Properties[i].NameEn()) == null)
+                    {
+                        Properties[i].Value = 0;
+                    }
+                    else
+                    {
+                        XElement propertyElement = element.Element("VoiceProperties").Element(Properties[i].NameEn());
+                        if (propertyElement == null)
+                        {
+                            Properties[i].Value = 0;
+                        }
+                        else if(!uint.TryParse(propertyElement.Value, out uint result))
+                        {
+                            Properties[i].Value = 0;
+                        }
+                        else
+                        {
+                            Properties[i].Value = result;
+                        }
+                    }
                 }
-                _emotions.Add(uint.Parse(emotionElement.Value));
-                i++;
             }
-            _cast = element.Element("Cast").Value;
-            _content = element.Element("Content").Value;
+            if (element.Element("Emotions") != null)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    XElement emotionElement = element.Element("Emotions").Element("Emotion" + i.ToString());
+                    if (emotionElement == null)
+                    {
+                        Emotions[i] = 0;
+                    }
+                    else if(!uint.TryParse(emotionElement.Value, out uint emotionValue))
+                    {
+                        Emotions[i] = 0;
+                    }
+                    else
+                    {
+                        Emotions[i] = emotionValue;
+                    }
+                }
+            }
+            if(element.Element("Cast") != null)
+            {
+                Cast = element.Element("Cast").Value;
+            }
+            if(element.Element("Content") != null)
+            {
+                Content = element.Element("Content").Value;
+            }
         }
-        public void OnLoadToGUI()
+        public void Default()
         {
-            GUI_Components.talkContentPart.OnChanged = null;
-            for (int i = 0;i < 5;i++)
-            {
-                if(i < _emotions.Count)
-                {
-                    GUI_Components.talkContentPart.emotionGauges[i].SetValue(_emotions[i], true);
-                }
-                else
-                {
-                    GUI_Components.talkContentPart.emotionGauges[i].SetValue(0, false);
-                }
-            }
-            GUI_Components.talkContentPart.UpdateEmotionLabel();
-            GUI_Components.talkContentPart.volumeGauge.SetValue(_volume);
-            GUI_Components.talkContentPart.speedGauge.SetValue(_speed);
-            GUI_Components.talkContentPart.toneGauge.SetValue(_tone);
-            GUI_Components.talkContentPart.alphaGauge.SetValue(_alpha);
-            GUI_Components.talkContentPart.toneScaleGauge.SetValue(_toneScale);
-            GUI_Components.talkContentPart.contentTextBox.Text = _content;
-            GUI_Components.talkContentPart.OnChanged = OnChanged;
-        }
-        void OnChanged()
-        {
-            _volume.Value = GUI_Components.talkContentPart.volumeGauge.GetValue();
-            _speed.Value = GUI_Components.talkContentPart.speedGauge.GetValue();
-            _tone.Value = GUI_Components.talkContentPart.toneGauge.GetValue();
-            _alpha.Value = GUI_Components.talkContentPart.alphaGauge.GetValue();
-            _toneScale.Value = GUI_Components.talkContentPart.toneScaleGauge.GetValue();
-            for (int i = 0; i < 5; i++)
-            {
-                if (i < _emotions.Count)
-                {
-                    _emotions[i] = GUI_Components.talkContentPart.emotionGauges[i].GetValue();
-                }
-            }
-            _cast = GUI_Components.talkContentPart.castsListBox.SelectedItem.ToString();
-            _content = GUI_Components.talkContentPart.contentTextBox.Text;
+            Properties.Add(new Volume());
+            Properties.Add(new Speed());
+            Properties.Add(new Tone());
+            Properties.Add(new Alpha());
+            _name = "New";
+            Properties = new List<VoiceProperty>() { new Volume(), new Speed(), new Tone(), new Alpha(), new ToneScale() };
+            Emotions = new List<uint>() { 0, 0, 0, 0, 0 };
+            Cast = Talker2.AvailableCasts[0];
+            Content = "";
         }
     }
     internal class ContentParser

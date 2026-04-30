@@ -15,15 +15,17 @@ namespace CeVIO_AI_時報.UI_Component
         Label _emotionNameLabel;
         Label _emotionValueLabel;
         public Action OnValueChanged;
-        public EmotionGauge(Point location)
+        public EmotionGauge(Point location, Control parent)
         {
             _emotionNameLabel = new Label();
             _emotionNameLabel.Location = location;
             _emotionNameLabel.Size = new Size(45, 12);
+            parent.Controls.Add(_emotionNameLabel);
 
             _emotionValueLabel = new Label();
             _emotionValueLabel.Location = location + new Size(0, 15);
             _emotionValueLabel.Size = new Size(45, 12);
+            parent.Controls.Add(_emotionValueLabel);
 
             _trackBar = new TrackBar();
             _trackBar.Location = location + new Size(0, 30);
@@ -32,6 +34,7 @@ namespace CeVIO_AI_時報.UI_Component
             _trackBar.Maximum = 100;
             _trackBar.Scroll += (sender, e) => OnGaugeMove();
             _trackBar.Orientation = Orientation.Vertical;
+            parent.Controls.Add(_trackBar);
 
             SetValue(0, false);
         }
@@ -58,6 +61,18 @@ namespace CeVIO_AI_時報.UI_Component
         void OnGaugeMove()
         {
             OnValueChanged?.Invoke();
+        }
+        public void Enable()
+        {
+            _trackBar.Enabled = true;
+            _emotionNameLabel.Enabled = true;
+            _emotionValueLabel.Enabled = true;
+        }
+        public void Disable()
+        {
+            _trackBar.Enabled = false;
+            _emotionNameLabel.Enabled = false;
+            _emotionValueLabel.Enabled = false;
         }
     }
 }

@@ -11,15 +11,20 @@ namespace CeVIO_AI_時報.ProcessUnit
 {
     internal class TimeCondition : IProcessUnit, IListboxAddDeletableComponent
     {
-        List<bool> _dayOfWeeks;
-        DateTime _startTime;
-        DateTime _endTime;
-        int _interval;
-        DateTime _lastTimeSpan;
+        public List<bool> DayOfWeeks;
+        public DateTime StartTime;
+        public DateTime EndTime;
+        public int Interval;
+        public DateTime LastTimeSpan;
         string _name;
-        RandomSelect _bindingRandomSelect;
+        public RandomSelect BindingRandomSelect;
+        public TimeCondition()
+        {
+            Default();
+        }
         public TimeCondition(XElement element)
         {
+            Default();
             LoadFromXML(element);
         }
         public string GetName()
@@ -34,47 +39,33 @@ namespace CeVIO_AI_時報.ProcessUnit
         public void OnRun()
         {
             DateTime now = DateTime.Now;
-            if ((now - _lastTimeSpan).TotalMinutes == 0)
+            if ((now - LastTimeSpan).TotalMinutes < 1)
             {
                 return;
             }
             if (SatisfyIntervalCondition() && SatisfyTimeRangeCondition())
             {
-                _bindingRandomSelect.OnRun();
+                BindingRandomSelect.OnRun();
             }
-            _lastTimeSpan = now;
-        }
-        public void OnLoadToGUI()
-        {
-            GUI_Components.timeConditionPart.OnChanged = null;
-            GUI_Components.timeConditionPart.SetDayOfWeeks(_dayOfWeeks);
-            GUI_Components.timeConditionPart.timeSelectorStart.SetTime(_startTime);
-            GUI_Components.timeConditionPart.timeSelectorEnd.SetTime(_endTime);
-            GUI_Components.timeConditionPart.intervalNumericUpDown.Value = _interval;
-            GUI_Components.timeConditionPart.OnChanged = OnChanged;
-        }
-        public void OnChanged()
-        {
-            _dayOfWeeks = GUI_Components.timeConditionPart.GetDayOfWeeks();
-            _startTime = GUI_Components.timeConditionPart.timeSelectorStart.GetTime();
-            _endTime = GUI_Components.timeConditionPart.timeSelectorEnd.GetTime();
-            _interval = (int)GUI_Components.timeConditionPart.intervalNumericUpDown.Value;
+            LastTimeSpan = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
+                DateTime.Now.Hour, DateTime.Now.Minute, 0);
         }
 
         public XElement StoreToXML()
         {
             XElement element = new XElement("TimeCondition");
             element.Add(new XElement("Name", _name));
+            element.Add(new XElement("Type", "Time"));
             XElement dayOfWeek = new XElement("DayOfWeeks");
             for(int i = 0; i < 7; i++)
             {
-                dayOfWeek.Add(new XElement("DayOfWeek", _dayOfWeeks[i]));
+                dayOfWeek.Add(new XElement("DayOfWeek", DayOfWeeks[i]));
             }
             element.Add(dayOfWeek);
-            element.Add(new XElement("StartTime", _startTime));
-            element.Add(new XElement("EndTime", _endTime));
-            element.Add(new XElement("Interval", _interval));
-            element.Add(_bindingRandomSelect.StoreToXML());
+            element.Add(new XElement("StartTime", StartTime.Ticks));
+            element.Add(new XElement("EndTime", EndTime.Ticks));
+            element.Add(new XElement("Interval", Interval));
+            element.Add(BindingRandomSelect.StoreToXML());
             return element;
         }
         public void LoadFromXML(XElement element)
@@ -83,54 +74,65 @@ namespace CeVIO_AI_時報.ProcessUnit
             {
                 throw new Exception();
             }
-            _name = element.Attribute("Name").Value;
-            if(element.Attribute("DayOfWeek") != null)
+            _name = element.Element("Name").Value;
+            if (element.Element("DayOfWeeks") != null)
             {
-                _dayOfWeeks = element.Element("DayOfWeeks").Elements("DayOfWeek").Select(x => bool.Parse(x.Value)).ToList();
+                DayOfWeeks = element.Element("DayOfWeeks").Elements("DayOfWeek").Select(x => bool.Parse(x.Value)).ToList();
             }
-            if(element.Element("DayOfWeeks") != null)
+            if(element.Element("StartTime") != null)
             {
-                ParseTFDayOfWeek(element.Element("DayOfWeeks").Value);
+                StartTime = new DateTime(long.Parse(element.Element("StartTime").Value));
             }
-            _startTime = DateTime.Parse(element.Element("StartTime").Value);
-            _endTime = DateTime.Parse(element.Element("EndTime").Value);
-            _interval = int.Parse(element.Element("Interval").Value);
-            if(element.Element("_0") == null)
+            if(element.Element("EndTime") != null)
             {
-                _bindingRandomSelect = new RandomSelect(element.Element("_0"));
+                EndTime = new DateTime(long.Parse(element.Element("EndTime").Value));
             }
-            if (element.Element("RandomSelect") == null)
+            if(element.Element("Interval") != null)
             {
-                _bindingRandomSelect = new RandomSelect(element.Element("RandomSelect"));
+                Interval = int.Parse(element.Element("Interval").Value);
             }
+            if (element.Element("RandomSelect") != null)
+            {
+                BindingRandomSelect = new RandomSelect(element.Element("RandomSelect"));
+            }
+        }
+        public void Default()
+        {
+            _name = "New";
+            DayOfWeeks = new List<bool>() { true, true, true, true, true, true, true };
+            StartTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            EndTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 59);
+            Interval = 60;
+            LastTimeSpan = DateTime.MinValue;
+            BindingRandomSelect = new RandomSelect();
         }
 
         public bool TodayApproved()
         {
             DateTime now = DateTime.Now;
-            return _dayOfWeeks[(int)now.DayOfWeek];
+            return DayOfWeeks[(int)now.DayOfWeek];
         }
         public bool TomorrowApproved()
         {
             DateTime now = DateTime.Now;
             int dayOfWeek = (int)now.DayOfWeek + 1;
             if (dayOfWeek == 7) dayOfWeek = 0;
-            return _dayOfWeeks[dayOfWeek];
+            return DayOfWeeks[dayOfWeek];
         }
         public bool SatisfyTimeRangeCondition()
         {
             DateTime now = DateTime.Now;
-            if (_startTime <= _endTime)
+            if (StartTime <= EndTime)
             {
-                if (TodayApproved() && now.TimeOfDay >= _startTime.TimeOfDay && now.TimeOfDay <= _endTime.TimeOfDay)
+                if (TodayApproved() && now.TimeOfDay >= StartTime.TimeOfDay && now.TimeOfDay <= EndTime.TimeOfDay)
                 {
                     return true;
                 }
             }
             else
             {
-                if ((TodayApproved() && now.TimeOfDay >= _startTime.TimeOfDay) ||
-                    (TomorrowApproved() && now.TimeOfDay <= _endTime.TimeOfDay))
+                if ((TodayApproved() && now.TimeOfDay >= StartTime.TimeOfDay) ||
+                    (TomorrowApproved() && now.TimeOfDay <= EndTime.TimeOfDay))
                 {
                     return true;
                 }
@@ -140,7 +142,7 @@ namespace CeVIO_AI_時報.ProcessUnit
         public bool SatisfyIntervalCondition()
         {
             DateTime now = DateTime.Now;
-            if ((now - _startTime).TotalMinutes % _interval == 0)
+            if ((int)(now - StartTime).TotalMinutes % Interval < 1)
             {
                 return true;
             }
@@ -152,11 +154,11 @@ namespace CeVIO_AI_時報.ProcessUnit
             {
                 if (dayOfWeekString[i] == 'T')
                 {
-                    _dayOfWeeks[i] = true;
+                    DayOfWeeks[i] = true;
                 }
                 else
                 {
-                    _dayOfWeeks[i] = false;
+                    DayOfWeeks[i] = false;
                 }
             }
     }

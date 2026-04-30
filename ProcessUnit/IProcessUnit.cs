@@ -12,6 +12,6 @@ namespace CeVIO_AI_時報.ProcessUnit
         void OnRun();
         XElement StoreToXML();
         void LoadFromXML(XElement element);
-        void OnLoadToGUI();
+        void Default();
     }
 }

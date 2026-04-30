@@ -1,4 +1,5 @@
-﻿using CeVIO_AI_時報.UI_Component;
+﻿using CeVIO_AI_時報.ProcessUnit;
+using CeVIO_AI_時報.UI_Component;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,48 +10,54 @@ using System.Windows.Forms;
 
 namespace CeVIO_AI_時報.GUI
 {
-    internal class GUI_TimeConditionPart : GUI_Part
+    internal class GUI_TimeConditionPart : GUIPart
     {
-        public List<CheckBox> dayOfWeekCheckBoxes;
-        public TimeSelector timeSelectorStart;
-        public TimeSelector timeSelectorEnd;
-        public NumericUpDown intervalNumericUpDown;
+        TimeCondition _timeCondition;
+        List<CheckBox> _dayOfWeekCheckBoxes;
+        TimeSelector _timeSelectorStart;
+        TimeSelector _timeSelectorEnd;
+        NumericUpDown _intervalNumericUpDown;
         Label _intervalLabel;
-        public Action OnChanged;
-        public GUI_TimeConditionPart(Point location)
+        public GUI_TimeConditionPart()
         {
-            dayOfWeekCheckBoxes = new List<CheckBox>();
+            _dayOfWeekCheckBoxes = new List<CheckBox>();
             List<string> dayOfWeekNames = new List<string>() { "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日" };
             for (int i = 0; i < 7; i++)
             {
-                dayOfWeekCheckBoxes.Add(new CheckBox());
-                dayOfWeekCheckBoxes.Last().Location = location + new Size(20 * i, 0);
-                dayOfWeekCheckBoxes.Last().Size = new Size(60, 16);
-                dayOfWeekCheckBoxes.Last().Text = dayOfWeekNames[i];
-                dayOfWeekCheckBoxes.Last().CheckedChanged += (sender, e) => OnChanged?.Invoke();
+                _dayOfWeekCheckBoxes.Add(new CheckBox());
+                _dayOfWeekCheckBoxes.Last().Location = new Point(10, 20 + 20 * i);
+                _dayOfWeekCheckBoxes.Last().Size = new Size(60, 16);
+                _dayOfWeekCheckBoxes.Last().Text = dayOfWeekNames[i];
+                _dayOfWeekCheckBoxes.Last().CheckedChanged += (sender, e) => OnChangedByUser?.Invoke();
+                Controls.Add(_dayOfWeekCheckBoxes.Last());
             }
-            timeSelectorStart = new TimeSelector(location + new Size(80, 0), "から");
-            timeSelectorStart.OnValueChanged += () => OnChanged?.Invoke();
-            timeSelectorEnd = new TimeSelector(location + new Size(80, 40), "まで");
-            timeSelectorEnd.OnValueChanged += () => OnChanged?.Invoke();
+            _timeSelectorStart = new TimeSelector(new Point(10, 160), "から", this);
+            _timeSelectorStart.OnValueChanged += () => OnChangedByUser?.Invoke();
 
-            intervalNumericUpDown = new NumericUpDown();
-            intervalNumericUpDown.Location = location + new Size(80, 80);
-            intervalNumericUpDown.Size = new Size(60, 20);
-            intervalNumericUpDown.Minimum = 1;
-            intervalNumericUpDown.Maximum = 1440;
-            intervalNumericUpDown.ValueChanged += (sender, e) => OnChanged?.Invoke();
+            _timeSelectorEnd = new TimeSelector(new Point(10, 200), "まで", this);
+            _timeSelectorEnd.OnValueChanged += () => OnChangedByUser?.Invoke();
+
+            _intervalNumericUpDown = new NumericUpDown();
+            _intervalNumericUpDown.Location = new Point(10, 240);
+            _intervalNumericUpDown.Size = new Size(60, 20);
+            _intervalNumericUpDown.Minimum = 1;
+            _intervalNumericUpDown.Maximum = 1440;
+            _intervalNumericUpDown.ValueChanged += (sender, e) => OnChangedByUser?.Invoke();
+            Controls.Add(_intervalNumericUpDown);
 
             _intervalLabel = new Label();
-            _intervalLabel.Location = location + new Size(140, 80);
-            _intervalLabel.Size = new Size(60, 60);
+            _intervalLabel.Location = new Point(70, 240);
+            _intervalLabel.Size = new Size(60, 20);
             _intervalLabel.Text = "分おき";
+            Controls.Add(_intervalLabel);
+
+            Disable();
         }
         public void SetDayOfWeeks(List<bool> dayOfWeeks)
         {
             for (int i = 0; i < 7; i++)
             {
-                dayOfWeekCheckBoxes[i].Checked = dayOfWeeks[i];
+                _dayOfWeekCheckBoxes[i].Checked = dayOfWeeks[i];
             }
         }
         public List<bool> GetDayOfWeeks()
@@ -58,9 +65,67 @@ namespace CeVIO_AI_時報.GUI
             List<bool> dayOfWeeks = new List<bool>();
             for (int i = 0; i < 7; i++)
             {
-                dayOfWeeks.Add(dayOfWeekCheckBoxes[i].Checked);
+                dayOfWeeks.Add(_dayOfWeekCheckBoxes[i].Checked);
             }
             return dayOfWeeks;
+        }
+        protected override void UpdateVisual()
+        {
+            SetDayOfWeeks(_timeCondition.DayOfWeeks);
+            _timeSelectorStart.SetTime(_timeCondition.StartTime);
+            _timeSelectorEnd.SetTime(_timeCondition.EndTime);
+            _intervalNumericUpDown.Value = _timeCondition.Interval;
+            GUI_Components.randomSelectPart.SetProcessUnit(_timeCondition.BindingRandomSelect);
+        }
+        protected override void UpdateValue()
+        {
+            if(_timeCondition != null)
+            {
+                _timeCondition.DayOfWeeks = GetDayOfWeeks();
+                _timeCondition.StartTime = _timeSelectorStart.GetTime();
+                _timeCondition.EndTime = _timeSelectorEnd.GetTime();
+                _timeCondition.Interval = (int)_intervalNumericUpDown.Value;
+            }
+        }
+        protected override void InitWithCeVIO()
+        {
+
+        }
+        public override void Disable()
+        {
+            Enabled = false;
+            foreach (CheckBox checkBox in _dayOfWeekCheckBoxes)
+            {
+                checkBox.Enabled = false;
+            }
+            _timeSelectorStart?.Disable();
+            _timeSelectorEnd?.Disable();
+            if (_intervalNumericUpDown != null) _intervalNumericUpDown.Enabled = false;
+            if (_intervalLabel != null) _intervalLabel.Enabled = false;
+        }
+        protected override void Enable()
+        {
+            Enabled = true;
+            foreach (CheckBox checkBox in _dayOfWeekCheckBoxes)
+            {
+                checkBox.Enabled = true;
+            }
+            _timeSelectorStart.Enable();
+            _timeSelectorEnd.Enable();
+            _intervalNumericUpDown.Enabled = true;
+            _intervalLabel.Enabled = true;
+        }
+        public void SetProcessUnit(TimeCondition timeCondition)
+        {
+            if(_timeCondition == timeCondition)
+            {
+                return;
+            }
+            _timeCondition = timeCondition;
+        }
+        protected override bool HasBindingProcessUnit()
+        {
+            return _timeCondition != null;
         }
     }
 }

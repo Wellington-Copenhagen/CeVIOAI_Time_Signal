@@ -57,21 +57,37 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI_Components.cs" />
-    <Compile Include="GUI_Manage.cs" />
+    <Compile Include="GUI\GUI_Components.cs" />
+    <Compile Include="GUI\GUIPart.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\VoiceOutput.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="GUI\RandomSelectPart.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\RootPart.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\TalkContentPart.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\TimeConditionPart.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ProcessUnit\IProcessUnit.cs" />
     <Compile Include="ProcessUnit\RandomSelect.cs" />
+    <Compile Include="ProcessUnit\RootLevel.cs" />
     <Compile Include="ProcessUnit\TalkContent.cs" />
     <Compile Include="ProcessUnit\TimeCondition.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Signal_Execute.cs" />
-    <Compile Include="Talker.cs" />
     <Compile Include="UI_Component\EmotionGauge.cs" />
-    <Compile Include="UI_Component\ListboxAddDeletable.cs" />
+    <Compile Include="UI_Component\ListBoxAddDeletable.cs" />
     <Compile Include="UI_Component\TimeSelector.cs" />
     <Compile Include="UI_Component\VoicePropertyGauge.cs" />
-    <Compile Include="XMLLoader.cs" />
+    <Compile Include="VoiceProperty.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

@@ -27,3 +27,8 @@ C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\obj\Debug\CeVIO_AI_時報.csproj
 C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\obj\Debug\CeVIO_AI_時報.csproj.CoreCompileInputs.cache
 C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\obj\Debug\CeVIO_AI_時報.exe
 C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\obj\Debug\CeVIO_AI_時報.pdb
+C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\bin\Debug\CeVIO_AI_時報.exe.config
+C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\bin\Debug\CeVIO_AI_時報.exe
+C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\bin\Debug\CeVIO_AI_時報.pdb
+C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\bin\Debug\CeVIO.Talk.RemoteService2.dll
+C:\Users\Admin\source\repos\CeVIOAI_Time_Signal\obj\Debug\CeVIO_AI.7C0C7AB1.Up2Date
