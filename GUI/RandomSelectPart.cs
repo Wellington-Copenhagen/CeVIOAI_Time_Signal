@@ -18,7 +18,10 @@ namespace CeVIO_AI_時報.GUI
         ListBoxAddDeletable<TalkContent> _talkContentListBox;
         public GUI_RandomSelectPart()
         {
-            _talkContentListBox = new ListBoxAddDeletable<TalkContent>(new Point(10, 20), this);
+            _talkContentListBox = new ListBoxAddDeletable<TalkContent>();
+            _talkContentListBox.Location = new Point(10, 20);
+            Controls.Add(_talkContentListBox);
+
             _talkContentListBox.OnChanged = () => OnChangedByUser?.Invoke();
 
             Disable();

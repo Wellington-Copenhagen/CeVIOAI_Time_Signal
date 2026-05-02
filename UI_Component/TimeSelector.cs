@@ -9,42 +9,44 @@ using System.Windows.Forms;
 namespace CeVIO_AI_時報.UI_Component
 {
     // 200x20の大きさ
-    internal class TimeSelector
+    internal class TimeSelector : UserControl
     {
         NumericUpDown _hourSelector;
         Label _hourLabel;
         NumericUpDown _minuteSelector;
         Label _minuteLabel;
         public Action OnValueChanged;
-        public TimeSelector(Point location, string suffix, Control parent)
+        public TimeSelector(string suffix)
         {
+            Size = new Size(200, 20);
+
             _hourSelector = new NumericUpDown();
-            _hourSelector.Location = location;
+            _hourSelector.Location = new Point(0, 0);
             _hourSelector.Size = new Size(60, 20);
             _hourSelector.Minimum = 0;
             _hourSelector.Maximum = 23;
             _hourSelector.ValueChanged += (sender, e) => OnValueChanged?.Invoke();
-            parent.Controls.Add(_hourSelector);
+            Controls.Add(_hourSelector);
 
             _hourLabel = new Label();
-            _hourLabel.Location = location + new Size(60, 0);
+            _hourLabel.Location = new Point(60, 0);
             _hourLabel.Size = new Size(20, 20);
             _hourLabel.Text = "時";
-            parent.Controls.Add(_hourLabel);
+            Controls.Add(_hourLabel);
 
             _minuteSelector = new NumericUpDown();
-            _minuteSelector.Location = location + new Size(80, 0);
+            _minuteSelector.Location = new Point(80, 0);
             _minuteSelector.Size = new Size(60, 20);
             _minuteSelector.Minimum = 0;
             _minuteSelector.Maximum = 59;
             _minuteSelector.ValueChanged += (sender, e) => OnValueChanged?.Invoke();
-            parent.Controls.Add(_minuteSelector);
+            Controls.Add(_minuteSelector);
 
             _minuteLabel = new Label();
-            _minuteLabel.Location = location + new Size(140, 0);
+            _minuteLabel.Location = new Point(140, 0);
             _minuteLabel.Size = new Size(60, 20);
             _minuteLabel.Text = "分" + suffix;
-            parent.Controls.Add(_minuteLabel);
+            Controls.Add(_minuteLabel);
         }
         public DateTime GetTime()
         {

@@ -2,6 +2,7 @@
 using CeVIO_AI_時報.UI_Component;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,20 @@ namespace CeVIO_AI_時報.ProcessUnit
 {
     internal class RandomSelect : IProcessUnit
     {
-        public List<TalkContent> Contents = new List<TalkContent>();
+        List<TalkContent> _contents;
+        public List<TalkContent> Contents
+        {
+            get
+            {
+                Debug.Assert(_contents != null);
+                return _contents;
+            }
+            set
+            {
+                Debug.Assert(value != null);
+                _contents = value;
+            }
+        }
         public RandomSelect(XElement element)
         {
             Default();
@@ -42,11 +56,10 @@ namespace CeVIO_AI_時報.ProcessUnit
         {
             if (element.Element("Type") == null || element.Element("Type").Value != "Random")
             {
-                throw new Exception();
+                return;
             }
             if(element.Element("Selections") != null)
             {
-                Contents = new List<TalkContent>();
                 foreach (XElement talkContent in element.Element("Selections").Elements())
                 {
                     Contents.Add(new TalkContent(talkContent));
@@ -55,6 +68,7 @@ namespace CeVIO_AI_時報.ProcessUnit
         }
         public void Default()
         {
+            Contents = new List<TalkContent>();
         }
     }
 }

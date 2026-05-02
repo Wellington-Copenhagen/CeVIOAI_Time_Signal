@@ -3,6 +3,8 @@ using CeVIO_AI_時報.GUI;
 using CeVIO_AI_時報.UI_Component;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,10 +15,80 @@ namespace CeVIO_AI_時報.ProcessUnit
     internal class TalkContent : IProcessUnit, IListboxAddDeletableComponent
     {
         string _name;
-        public List<VoiceProperty> Properties = new List<VoiceProperty>();
-        public List<uint> Emotions;
-        public string Cast;
-        public string Content;
+        List<VoiceProperty> _properties;
+        public List<VoiceProperty> Properties
+        {
+            get
+            {
+                Debug.Assert(_properties != null);
+                return _properties;
+            }
+            set
+            {
+                Debug.Assert(value != null);
+                Debug.Assert(value.Count == 5);
+                for(int i = 0; i < 5; i++)
+                {
+                    Debug.Assert(value[i] != null);
+                }
+                Debug.Assert(value[0] is Volume);
+                Debug.Assert(value[1] is Speed);
+                Debug.Assert(value[2] is Tone);
+                Debug.Assert(value[3] is Alpha);
+                Debug.Assert(value[4] is ToneScale);
+                _properties = value;
+            }
+        }
+        List<uint> _emotions;
+        public List<uint> Emotions
+        {
+            get
+            {
+                Debug.Assert(_emotions != null);
+                return _emotions;
+            }
+            set
+            {
+                Debug.Assert(value != null);
+                Debug.Assert(value.Count == 5);
+                for (int i = 0;i < 5; i++)
+                {
+                    Debug.Assert(value[i] <= 100);
+                }
+                _emotions = value;
+            }
+        }
+
+        // 現在実行できないキャストでもよい
+        // ほかのユーザーの作ったデータでも読めるようにするため
+        string _cast;
+        public string Cast
+        {
+            get
+            {
+                Debug.Assert(_cast != null);
+                return _cast;
+            }
+            set
+            {
+                Debug.Assert(value != null);
+                _cast = value;
+            }
+        }
+        string _content;
+        public string Content
+        {
+            get
+            {
+                Debug.Assert(_content != null);
+                return _content;
+            }
+            set
+            {
+                Debug.Assert(value != null);
+                _content = value;
+            }
+        }
         public TalkContent()
         {
             Default();
@@ -72,10 +144,13 @@ namespace CeVIO_AI_時報.ProcessUnit
         {
             if (element.Element("Type") == null || element.Element("Type").Value != "Read")
             {
-                throw new Exception();
+                return;
             }
-            _name = element.Element("Name").Value;
-            if(element.Element("VoiceProperties") != null)
+            if (element.Element("Name") != null)
+            {
+                _name = element.Element("Name").Value;
+            }
+            if (element.Element("VoiceProperties") != null)
             {
                 for (int i = 0; i < 5; i++)
                 {
@@ -131,20 +206,17 @@ namespace CeVIO_AI_時報.ProcessUnit
         }
         public void Default()
         {
-            Properties.Add(new Volume());
-            Properties.Add(new Speed());
-            Properties.Add(new Tone());
-            Properties.Add(new Alpha());
             _name = "New";
             Properties = new List<VoiceProperty>() { new Volume(), new Speed(), new Tone(), new Alpha(), new ToneScale() };
-            Emotions = new List<uint>() { 0, 0, 0, 0, 0 };
+            Emotions = new List<uint>() { 50, 50, 50, 50, 50 };
             Cast = Talker2.AvailableCasts[0];
             Content = "";
         }
     }
     internal class ContentParser
     {
-
+        // エラーは出さない
+        // errorで変換できないことを出力する。
         static public void Parse(string content, out string error)
         {
             Dictionary<string, string> ParseDictionary = new Dictionary<string, string>();
@@ -179,41 +251,29 @@ namespace CeVIO_AI_時報.ProcessUnit
                     ParseDictionary["曜日"] = "土曜日";
                     break;
             }
-            int pointer = 0;
-            int startParen = -1;
             error = "";
-            while (pointer < content.Length)
+            int parenCount = content.Count((c) => { return c == '{'; });
+            if(parenCount != content.Count((c) => { return c == '}'; }))
             {
-                if (content[pointer] == '{')
+                error = "中括弧の数が合っていません。\n";
+                return;
+            }
+            for (int i = 0;i < parenCount; i++)
+            {
+                int start = content.IndexOf('{');
+                int end = content.IndexOf('}');
+                string inParen = content.Substring(start + 1, end - start - 1);
+                if (ParseDictionary.ContainsKey(inParen))
                 {
-                    startParen = pointer;
+                    content = content.Remove(start, end - start + 1);
+                    content = content.Insert(start, ParseDictionary[inParen]);
                 }
-                if (content[pointer] == '}')
+                else
                 {
-                    if (startParen == -1)
-                    {
-                        error = "中括弧の位置関係がおかしいです。";
-                        break;
-                    }
-                    string inParen = content.Substring(startParen + 1, pointer);
-                    bool find = false;
-                    foreach (KeyValuePair<string, string> pair in ParseDictionary)
-                    {
-                        if (SameString(inParen, pair.Key))
-                        {
-                            content = content.Remove(startParen, pointer + 1);
-                            content = content.Insert(startParen, pair.Value);
-                            pointer = startParen + pair.Value.Length - 1;
-                            find = true;
-                            break;
-                        }
-                    }
-                    if (!find)
-                    {
-                        error = error + "中括弧の中が変換できない言葉です。";
-                    }
+                    string surrounding = content.Substring(Math.Max(0, start - 10), Math.Min(end + 10, content.Length));
+                    error = error + $"「{inParen}」は変換できない言葉です。\n周りの文: {surrounding}\n";
+                    return;
                 }
-                pointer++;
             }
         }
         static public bool SameString(string A, string B)

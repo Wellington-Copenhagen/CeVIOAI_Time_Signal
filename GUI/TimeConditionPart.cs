@@ -31,11 +31,15 @@ namespace CeVIO_AI_時報.GUI
                 _dayOfWeekCheckBoxes.Last().CheckedChanged += (sender, e) => OnChangedByUser?.Invoke();
                 Controls.Add(_dayOfWeekCheckBoxes.Last());
             }
-            _timeSelectorStart = new TimeSelector(new Point(10, 160), "から", this);
+            _timeSelectorStart = new TimeSelector("から");
+            _timeSelectorStart.Location = new Point(10, 160);
             _timeSelectorStart.OnValueChanged += () => OnChangedByUser?.Invoke();
+            Controls.Add(_timeSelectorStart);
 
-            _timeSelectorEnd = new TimeSelector(new Point(10, 200), "まで", this);
+            _timeSelectorEnd = new TimeSelector("まで");
+            _timeSelectorEnd.Location = new Point(10, 200);
             _timeSelectorEnd.OnValueChanged += () => OnChangedByUser?.Invoke();
+            Controls.Add( _timeSelectorEnd);
 
             _intervalNumericUpDown = new NumericUpDown();
             _intervalNumericUpDown.Location = new Point(10, 240);

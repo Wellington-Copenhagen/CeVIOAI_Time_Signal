@@ -9,32 +9,34 @@ using System.Windows.Forms;
 namespace CeVIO_AI_時報.UI_Component
 {
     // 45x90の大きさ
-    internal class EmotionGauge
+    internal class EmotionGauge : UserControl
     {
         TrackBar _trackBar;
         Label _emotionNameLabel;
         Label _emotionValueLabel;
         public Action OnValueChanged;
-        public EmotionGauge(Point location, Control parent)
+        public EmotionGauge()
         {
+            Size = new Size(45, 90);
+
             _emotionNameLabel = new Label();
-            _emotionNameLabel.Location = location;
+            _emotionNameLabel.Location = new Point(0, 0);
             _emotionNameLabel.Size = new Size(45, 12);
-            parent.Controls.Add(_emotionNameLabel);
+            Controls.Add(_emotionNameLabel);
 
             _emotionValueLabel = new Label();
-            _emotionValueLabel.Location = location + new Size(0, 15);
+            _emotionValueLabel.Location = new Point(0, 15);
             _emotionValueLabel.Size = new Size(45, 12);
-            parent.Controls.Add(_emotionValueLabel);
+            Controls.Add(_emotionValueLabel);
 
             _trackBar = new TrackBar();
-            _trackBar.Location = location + new Size(0, 30);
+            _trackBar.Location = new Point(0, 30);
             _trackBar.Size = new Size(45, 60);
             _trackBar.Minimum = 0;
             _trackBar.Maximum = 100;
             _trackBar.Scroll += (sender, e) => OnGaugeMove();
             _trackBar.Orientation = Orientation.Vertical;
-            parent.Controls.Add(_trackBar);
+            Controls.Add(_trackBar);
 
             SetValue(0, false);
         }

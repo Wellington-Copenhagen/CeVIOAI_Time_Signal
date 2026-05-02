@@ -2,6 +2,7 @@
 using CeVIO_AI_時報.UI_Component;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,20 @@ namespace CeVIO_AI_時報.ProcessUnit
 {
     internal class RootLevel : IProcessUnit
     {
-        public List<TimeCondition> TimeConditions = new List<TimeCondition>();
+        List<TimeCondition> _timeConditions;
+        public List<TimeCondition> TimeConditions
+        {
+            get
+            {
+                Debug.Assert(_timeConditions != null);
+                return _timeConditions;
+            }
+            set
+            {
+                Debug.Assert(value != null);
+                _timeConditions = value;
+            }
+        }
         public RootLevel()
         {
             Default();
@@ -43,11 +57,10 @@ namespace CeVIO_AI_時報.ProcessUnit
         {
             if (element.Element("Type") == null || element.Element("Type").Value != "Root")
             {
-                throw new Exception();
+                return;
             }
             if (element.Element("TimeConditions") != null)
             {
-                TimeConditions = new List<TimeCondition>();
                 foreach (XElement timeCondition in element.Element("TimeConditions").Elements())
                 {
                     TimeConditions.Add(new TimeCondition(timeCondition));

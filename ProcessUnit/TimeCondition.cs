@@ -2,6 +2,7 @@
 using CeVIO_AI_時報.UI_Component;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,13 +10,71 @@ using System.Xml.Linq;
 
 namespace CeVIO_AI_時報.ProcessUnit
 {
+    // インターフェイスの条件をみたしている
     internal class TimeCondition : IProcessUnit, IListboxAddDeletableComponent
     {
-        public List<bool> DayOfWeeks;
-        public DateTime StartTime;
-        public DateTime EndTime;
-        public int Interval;
-        public DateTime LastTimeSpan;
+        // 必ず要素数は7、0番目が日曜日
+        List<bool> _dayOfWeeks;
+        public List<bool> DayOfWeeks
+        {
+            get
+            {
+                Debug.Assert(_dayOfWeeks != null);
+                return _dayOfWeeks;
+            }
+            set
+            {
+                Debug.Assert(value != null);
+                Debug.Assert(value.Count == 7);
+                _dayOfWeeks = value;
+            }
+        }
+
+        DateTime _startTime;
+        public DateTime StartTime
+        {
+            get
+            {
+                Debug.Assert(_startTime != null);
+                return _startTime;
+            }
+            set {
+                Debug.Assert(value != null);
+                _startTime = value;
+            }
+        }
+
+        DateTime _endTime;
+        public DateTime EndTime
+        {
+            get
+            {
+                Debug.Assert(_endTime != null);
+                return _endTime;
+            }
+            set
+            {
+                Debug.Assert(value != null);
+                _endTime = value;
+            }
+        }
+
+        // 単位は分
+        int _interval;
+        public int Interval
+        {
+            get
+            {
+                return _interval;
+            }
+            set
+            {
+                Debug.Assert(value > 0);
+                _interval = value;
+            }
+        }
+
+        DateTime LastTimeSpan;
         string _name;
         public RandomSelect BindingRandomSelect;
         public TimeCondition()
@@ -72,9 +131,12 @@ namespace CeVIO_AI_時報.ProcessUnit
         {
             if(element.Element("Type") == null || element.Element("Type").Value != "Time")
             {
-                throw new Exception();
+                return;
             }
-            _name = element.Element("Name").Value;
+            if(element.Element("Name") != null)
+            {
+                _name = element.Element("Name").Value;
+            }
             if (element.Element("DayOfWeeks") != null)
             {
                 DayOfWeeks = element.Element("DayOfWeeks").Elements("DayOfWeek").Select(x => bool.Parse(x.Value)).ToList();
@@ -100,8 +162,9 @@ namespace CeVIO_AI_時報.ProcessUnit
         {
             _name = "New";
             DayOfWeeks = new List<bool>() { true, true, true, true, true, true, true };
-            StartTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
-            EndTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 59);
+            DateTime now = DateTime.Now;
+            StartTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
+            EndTime = new DateTime(now.Year, now.Month, now.Day, 23, 59, 59);
             Interval = 60;
             LastTimeSpan = DateTime.MinValue;
             BindingRandomSelect = new RandomSelect();
@@ -112,11 +175,11 @@ namespace CeVIO_AI_時報.ProcessUnit
             DateTime now = DateTime.Now;
             return DayOfWeeks[(int)now.DayOfWeek];
         }
-        public bool TomorrowApproved()
+        public bool YesterdayApproved()
         {
             DateTime now = DateTime.Now;
-            int dayOfWeek = (int)now.DayOfWeek + 1;
-            if (dayOfWeek == 7) dayOfWeek = 0;
+            int dayOfWeek = (int)now.DayOfWeek - 1;
+            if (dayOfWeek == -1) dayOfWeek = 6;
             return DayOfWeeks[dayOfWeek];
         }
         public bool SatisfyTimeRangeCondition()
@@ -132,7 +195,7 @@ namespace CeVIO_AI_時報.ProcessUnit
             else
             {
                 if ((TodayApproved() && now.TimeOfDay >= StartTime.TimeOfDay) ||
-                    (TomorrowApproved() && now.TimeOfDay <= EndTime.TimeOfDay))
+                    (YesterdayApproved() && now.TimeOfDay <= EndTime.TimeOfDay))
                 {
                     return true;
                 }
@@ -148,19 +211,5 @@ namespace CeVIO_AI_時報.ProcessUnit
             }
             return false;
         }
-        void ParseTFDayOfWeek(string dayOfWeekString)
-        {
-            for(int i = 0; i < 7; i++)
-            {
-                if (dayOfWeekString[i] == 'T')
-                {
-                    DayOfWeeks[i] = true;
-                }
-                else
-                {
-                    DayOfWeeks[i] = false;
-                }
-            }
     }
-}
 }

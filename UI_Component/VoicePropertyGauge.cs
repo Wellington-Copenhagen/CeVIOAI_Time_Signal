@@ -9,7 +9,7 @@ using System.Windows.Forms;
 namespace CeVIO_AI_時報.UI_Component
 {
     // 40x70の大きさ
-    internal class VoicePropertyGauge
+    internal class VoicePropertyGauge : UserControl
     {
         Label _nameLabel;
         Button _upButton;
@@ -17,31 +17,33 @@ namespace CeVIO_AI_時報.UI_Component
         Button _downButton;
         public Action OnValueChanged;
         VoiceProperty _value;
-        public VoicePropertyGauge(Point location, Control parent)
+        public VoicePropertyGauge()
         {
+            Size = new Size(40, 68);
+
             _nameLabel = new Label();
-            _nameLabel.Location = location;
+            _nameLabel.Location = new Point(0, 0);
             _nameLabel.Size = new Size(40, 12);
-            parent.Controls.Add(_nameLabel);
+            Controls.Add(_nameLabel);
 
             _upButton = new Button();
-            _upButton.Location = location + new Size(0, 15);
+            _upButton.Location = new Point(0, 15);
             _upButton.Size = new Size(40, 18);
             _upButton.Text = "∧";
             _upButton.Click += (sender, e) => OnUpButtonClick();
-            parent.Controls.Add(_upButton);
+            Controls.Add(_upButton);
 
             _valueLabel = new Label();
-            _valueLabel.Location = location + new Size(0, 35);
+            _valueLabel.Location = new Point(0, 35);
             _valueLabel.Size = new Size(40, 12);
-            parent.Controls.Add(_valueLabel);
+            Controls.Add(_valueLabel);
 
             _downButton = new Button();
-            _downButton.Location = location + new Size(0, 50);
+            _downButton.Location = new Point(0, 50);
             _downButton.Size = new Size(40, 18);
             _downButton.Text = "∨";
             _downButton.Click += (sender, e) => OnDownButtonClick();
-            parent.Controls.Add(_downButton);
+            Controls.Add(_downButton);
         }
         public void SetValue(VoiceProperty value)
         {

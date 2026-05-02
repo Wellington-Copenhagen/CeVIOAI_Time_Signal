@@ -26,12 +26,16 @@ namespace CeVIO_AI_時報.GUI
         {
             for(int i = 0;i < 5; i++)
             {
-                _voicePropertyGauges.Add(new VoicePropertyGauge(new Point(10 + 50 * i, 20), this));
+                _voicePropertyGauges.Add(new VoicePropertyGauge());
+                _voicePropertyGauges.Last().Location = new Point(10 + 50 * i, 20);
                 _voicePropertyGauges.Last().OnValueChanged += () => OnChangedByUser?.Invoke();
+                Controls.Add(_voicePropertyGauges.Last());
             }
             for (int i = 0; i < 5; i++)
             {
-                _emotionGauges.Add(new EmotionGauge(new Point(10 + 50 * i, 110), this));
+                _emotionGauges.Add(new EmotionGauge());
+                _emotionGauges.Last().Location = new Point(10 + 50 * i, 110);
+                Controls.Add(_emotionGauges.Last());
                 _emotionGauges.Last().OnValueChanged += () => OnChangedByUser?.Invoke();
             }
 

@@ -10,65 +10,66 @@ using System.Xml.Linq;
 namespace CeVIO_AI_時報.UI_Component
 {
     // 120x340の大きさ
-    public class ListBoxAddDeletable<T> where T : IListboxAddDeletableComponent , new()
+    public class ListBoxAddDeletable<T> : UserControl 
+        where T : IListboxAddDeletableComponent , new()
     {
         ListBox _listbox;
         Button _deleteButton;
         Button _addButton;
         Button _renameButton;
-        Label _label_name;
         TextBox _nameBox;
         Button _moveUpButton;
         Button _moveDownButton;
         List<T> _components = new List<T>();
         public Action OnChanged;
-        public ListBoxAddDeletable(Point position, Control panel)
+        public ListBoxAddDeletable()
         {
+            Size = new Size(120, 340);
+
             _listbox = new ListBox();
-            _listbox.Location = position;
+            _listbox.Location = new Point(0, 0);
             _listbox.Size = new Size(120, 240);
             _listbox.SelectedIndexChanged += OnSelectedIndexChanged;
-            panel.Controls.Add( _listbox );
-
+            Controls.Add( _listbox );
             _deleteButton = new Button();
-            _deleteButton.Location = position + new Size(5, 245);
+            _deleteButton.Location = new Point(5, 245);
             _deleteButton.Size = new Size(50, 20);
             _deleteButton.Text = "削除";
             _deleteButton.Click += (sender, e) => Delete();
-            panel.Controls.Add( _deleteButton );
+            Controls.Add( _deleteButton );
 
             _addButton = new Button();
-            _addButton.Location = position + new Size(65, 245);
+            _addButton.Location = new Point(65, 245);
             _addButton.Size = new Size(50, 20);
             _addButton.Text = "追加";
             _addButton.Click += (sender, e) => Add();
-            panel.Controls.Add( _addButton );
+            Controls.Add( _addButton );
 
             _renameButton = new Button();
-            _renameButton.Location = position + new Size(5, 270);
+            _renameButton.Location = new Point(5, 270);
             _renameButton.Size = new Size(110, 20);
             _renameButton.Text = "名前を変更";
             _renameButton.Click += (sender, e) => Rename();
-            panel.Controls.Add( _renameButton );
+            Controls.Add( _renameButton );
 
             _nameBox = new TextBox();
-            _nameBox.Location = position + new Size(5, 295);
+            _nameBox.Location = new Point(5, 295);
             _nameBox.Size = new Size(110, 20);
-            panel.Controls.Add( _nameBox );
+            Controls.Add( _nameBox );
 
             _moveUpButton = new Button();
-            _moveUpButton.Location = position + new Size(5, 320);
+            _moveUpButton.Location = new Point(5, 320);
             _moveUpButton.Size = new Size(50, 20);
             _moveUpButton.Text = "上へ";
             _moveUpButton.Click += (sender, e) => MoveUp();
-            panel.Controls.Add( _moveUpButton );
+            Controls.Add( _moveUpButton );
 
             _moveDownButton = new Button();
-            _moveDownButton.Location = position + new Size(65, 320);
+            _moveDownButton.Location = new Point(65, 320);
             _moveDownButton.Size = new Size(50, 20);
             _moveDownButton.Text = "下へ";
             _moveDownButton.Click += (sender, e) => MoveDown();
-            panel.Controls.Add( _moveDownButton );
+            Controls.Add( _moveDownButton );
 
             UpdateAppearance(-1);
         }

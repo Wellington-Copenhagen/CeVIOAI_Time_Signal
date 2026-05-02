@@ -17,8 +17,10 @@ namespace CeVIO_AI_時報.GUI
         ListBoxAddDeletable<TimeCondition> listBox;
         public GUI_RootPart()
         {
-            listBox = new ListBoxAddDeletable<TimeCondition>(new Point(10,20), this);
+            listBox = new ListBoxAddDeletable<TimeCondition>();
+            listBox.Location = new Point(10, 20);
             listBox.OnChanged = () => OnChangedByUser?.Invoke();
+            Controls.Add(listBox);
 
             Disable();
         }
