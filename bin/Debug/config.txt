@@ -3,7 +3,7 @@
   <Type>Root</Type>
   <TimeConditions>
     <TimeCondition>
-      <Name>New(0)</Name>
+      <Name>時報</Name>
       <Type>Time</Type>
       <DayOfWeeks>
         <DayOfWeek>true</DayOfWeek>
@@ -11,34 +11,197 @@
         <DayOfWeek>true</DayOfWeek>
         <DayOfWeek>true</DayOfWeek>
         <DayOfWeek>true</DayOfWeek>
-        <DayOfWeek>false</DayOfWeek>
-        <DayOfWeek>false</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
       </DayOfWeeks>
-      <StartTime>639131040000000000</StartTime>
-      <EndTime>639131903400000000</EndTime>
-      <Interval>1</Interval>
+      <StartTime>639133632000000000</StartTime>
+      <EndTime>639134495400000000</EndTime>
+      <Interval>10</Interval>
       <RandomSelect>
         <Type>Random</Type>
         <Selections>
           <TalkContent>
-            <Name>New(0)</Name>
+            <Name>New</Name>
             <Type>Read</Type>
             <VoiceProperties>
-              <Volume>50</Volume>
-              <Speed>56</Speed>
+              <Volume>57</Volume>
+              <Speed>52</Speed>
               <Tone>52</Tone>
               <Alpha>50</Alpha>
               <ToneScale>50</ToneScale>
             </VoiceProperties>
             <Emotions>
-              <Emotion0>39</Emotion0>
-              <Emotion1>61</Emotion1>
+              <Emotion0>61</Emotion0>
+              <Emotion1>0</Emotion1>
               <Emotion2>0</Emotion2>
-              <Emotion3>33</Emotion3>
-              <Emotion4>42</Emotion4>
+              <Emotion3>45</Emotion3>
+              <Emotion4>67</Emotion4>
             </Emotions>
             <Cast>すずきつづみ</Cast>
-            <Content>こんにちは！</Content>
+            <Content>マスター、今は{時}時{分}分です。</Content>
+          </TalkContent>
+        </Selections>
+      </RandomSelect>
+    </TimeCondition>
+    <TimeCondition>
+      <Name>日付が変わった時</Name>
+      <Type>Time</Type>
+      <DayOfWeeks>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+      </DayOfWeeks>
+      <StartTime>639133632000000000</StartTime>
+      <EndTime>639133632000000000</EndTime>
+      <Interval>60</Interval>
+      <RandomSelect>
+        <Type>Random</Type>
+        <Selections>
+          <TalkContent>
+            <Name>New</Name>
+            <Type>Read</Type>
+            <VoiceProperties>
+              <Volume>60</Volume>
+              <Speed>51</Speed>
+              <Tone>53</Tone>
+              <Alpha>50</Alpha>
+              <ToneScale>50</ToneScale>
+            </VoiceProperties>
+            <Emotions>
+              <Emotion0>24</Emotion0>
+              <Emotion1>0</Emotion1>
+              <Emotion2>0</Emotion2>
+              <Emotion3>15</Emotion3>
+              <Emotion4>0</Emotion4>
+            </Emotions>
+            <Cast>すずきつづみ</Cast>
+            <Content>日付が変わりました。今日は{月}月{日}日です。</Content>
+          </TalkContent>
+        </Selections>
+      </RandomSelect>
+    </TimeCondition>
+    <TimeCondition>
+      <Name>はよねろ</Name>
+      <Type>Time</Type>
+      <DayOfWeeks>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+      </DayOfWeeks>
+      <StartTime>639133632000000000</StartTime>
+      <EndTime>639133848000000000</EndTime>
+      <Interval>10</Interval>
+      <RandomSelect>
+        <Type>Random</Type>
+        <Selections>
+          <TalkContent>
+            <Name>New</Name>
+            <Type>Read</Type>
+            <VoiceProperties>
+              <Volume>50</Volume>
+              <Speed>49</Speed>
+              <Tone>48</Tone>
+              <Alpha>55</Alpha>
+              <ToneScale>45</ToneScale>
+            </VoiceProperties>
+            <Emotions>
+              <Emotion0>24</Emotion0>
+              <Emotion1>33</Emotion1>
+              <Emotion2>0</Emotion2>
+              <Emotion3>27</Emotion3>
+              <Emotion4>52</Emotion4>
+            </Emotions>
+            <Cast>すずきつづみ</Cast>
+            <Content>マスター？もう寝ましょう</Content>
+          </TalkContent>
+          <TalkContent>
+            <Name>New(0)</Name>
+            <Type>Read</Type>
+            <VoiceProperties>
+              <Volume>53</Volume>
+              <Speed>52</Speed>
+              <Tone>52</Tone>
+              <Alpha>50</Alpha>
+              <ToneScale>53</ToneScale>
+            </VoiceProperties>
+            <Emotions>
+              <Emotion0>50</Emotion0>
+              <Emotion1>0</Emotion1>
+              <Emotion2>15</Emotion2>
+              <Emotion3>0</Emotion3>
+              <Emotion4>24</Emotion4>
+            </Emotions>
+            <Cast>すずきつづみ</Cast>
+            <Content>早く寝たほうがいいわ</Content>
+          </TalkContent>
+        </Selections>
+      </RandomSelect>
+    </TimeCondition>
+    <TimeCondition>
+      <Name>冷静になれ</Name>
+      <Type>Time</Type>
+      <DayOfWeeks>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+      </DayOfWeeks>
+      <StartTime>639133632000000000</StartTime>
+      <EndTime>639134495400000000</EndTime>
+      <Interval>15</Interval>
+      <RandomSelect>
+        <Type>Random</Type>
+        <Selections>
+          <TalkContent>
+            <Name>New</Name>
+            <Type>Read</Type>
+            <VoiceProperties>
+              <Volume>56</Volume>
+              <Speed>52</Speed>
+              <Tone>51</Tone>
+              <Alpha>50</Alpha>
+              <ToneScale>48</ToneScale>
+            </VoiceProperties>
+            <Emotions>
+              <Emotion0>39</Emotion0>
+              <Emotion1>0</Emotion1>
+              <Emotion2>0</Emotion2>
+              <Emotion3>0</Emotion3>
+              <Emotion4>21</Emotion4>
+            </Emotions>
+            <Cast>すずきつづみ</Cast>
+            <Content>違うことをして頭を冷やすのも重要よ？</Content>
+          </TalkContent>
+          <TalkContent>
+            <Name>New(0)</Name>
+            <Type>Read</Type>
+            <VoiceProperties>
+              <Volume>50</Volume>
+              <Speed>51</Speed>
+              <Tone>50</Tone>
+              <Alpha>50</Alpha>
+              <ToneScale>48</ToneScale>
+            </VoiceProperties>
+            <Emotions>
+              <Emotion0>52</Emotion0>
+              <Emotion1>0</Emotion1>
+              <Emotion2>0</Emotion2>
+              <Emotion3>0</Emotion3>
+              <Emotion4>27</Emotion4>
+            </Emotions>
+            <Cast>すずきつづみ</Cast>
+            <Content>目的がなんであるか、今一度思い返すのが大事よ</Content>
           </TalkContent>
         </Selections>
       </RandomSelect>

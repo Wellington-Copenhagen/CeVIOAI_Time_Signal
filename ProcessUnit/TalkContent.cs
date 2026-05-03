@@ -113,11 +113,11 @@ namespace CeVIO_AI_時報.ProcessUnit
             GUI_Components.voiceOutput.Emotions = Emotions;
             GUI_Components.voiceOutput.Content = Content;
             string parsed = Content;
-            ContentParser.Parse(parsed, out string error);
+            ContentParser.Parse(ref parsed, out string error);
             GUI_Components.voiceOutput.Content = parsed;
             GUI_Components.voiceOutput.AlternativeText = error;
 
-            GUI_Components.voiceOutput.Talk();
+            GUI_Components.voiceOutput.AddNewTalkUnit();
         }
         public XElement StoreToXML()
         {
@@ -208,16 +208,16 @@ namespace CeVIO_AI_時報.ProcessUnit
         {
             _name = "New";
             Properties = new List<VoiceProperty>() { new Volume(), new Speed(), new Tone(), new Alpha(), new ToneScale() };
-            Emotions = new List<uint>() { 50, 50, 50, 50, 50 };
+            Emotions = new List<uint>() { 0, 0, 0, 0, 0 };
             Cast = Talker2.AvailableCasts[0];
-            Content = "";
+            Content = "こんにちは！今は{月}月{日}日{時}時{分}分です。";
         }
     }
     internal class ContentParser
     {
         // エラーは出さない
         // errorで変換できないことを出力する。
-        static public void Parse(string content, out string error)
+        static public void Parse(ref string content, out string error)
         {
             Dictionary<string, string> ParseDictionary = new Dictionary<string, string>();
             DateTime now = DateTime.Now;
@@ -225,7 +225,7 @@ namespace CeVIO_AI_時報.ProcessUnit
             ParseDictionary["年"] = now.Year.ToString();
             ParseDictionary["月"] = now.Month.ToString();
             ParseDictionary["日"] = now.Day.ToString();
-            ParseDictionary["時"] = now.Second.ToString();
+            ParseDictionary["時"] = now.Hour.ToString();
             ParseDictionary["分"] = now.Minute.ToString();
             switch (now.DayOfWeek)
             {

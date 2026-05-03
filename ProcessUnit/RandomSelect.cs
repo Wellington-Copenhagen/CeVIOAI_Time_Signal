@@ -58,6 +58,7 @@ namespace CeVIO_AI_時報.ProcessUnit
             {
                 return;
             }
+            Contents.Clear();
             if(element.Element("Selections") != null)
             {
                 foreach (XElement talkContent in element.Element("Selections").Elements())
@@ -69,6 +70,7 @@ namespace CeVIO_AI_時報.ProcessUnit
         public void Default()
         {
             Contents = new List<TalkContent>();
+            Contents.Add(new TalkContent());
         }
     }
 }

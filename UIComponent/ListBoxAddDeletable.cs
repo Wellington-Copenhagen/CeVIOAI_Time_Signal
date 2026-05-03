@@ -150,7 +150,7 @@ namespace CeVIO_AI_時報.UI_Component
             }
             else
             {
-                return (T)_listbox.SelectedItem;
+                return _components[SelectedIndex];
             }
         }
         void Delete()
@@ -222,7 +222,6 @@ namespace CeVIO_AI_時報.UI_Component
         }
         public override void Disable()
         {
-            _listbox.Items.Clear();
             _listbox.Enabled = false;
             _deleteButton.Enabled = false;
             _addButton.Enabled = false;

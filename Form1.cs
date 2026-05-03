@@ -31,17 +31,7 @@ namespace CeVIO_AI_時報
         public Form1()
         {
             InitializeComponent();
-            HostStartResult startResult = ServiceControl2.StartHost(false);
-            if(startResult != HostStartResult.Succeeded)
-            {
-                MessageBox.Show("CeVIOトークエディタが起動できませんでした。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Environment.Exit(0);
-            }
-            if(Talker2.AvailableCasts.Count() == 0)
-            {
-                MessageBox.Show("利用可能なキャストがいませんでした。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Environment.Exit(0);
-            }
+            GUI_Components.StartHost();
             Size = new Size(1000, 800);
             GUI_Components.PlaceComponents(this);
 
@@ -68,6 +58,7 @@ namespace CeVIO_AI_時報
 
             GUI_Components.saveButton.Click += (sender, e) => SaveToFile();
             GUI_Components.modeChangeButton.Click += (sender, e) => OnModeChangeButtonClicked();
+            GUI_Components.loadButton.Click += (sender, e) => LoadData();
 
             GUI_Components.rootPart.SetProcessUnit(rootLevel);
             GUI_Components.OnDataLoaded();
@@ -76,8 +67,9 @@ namespace CeVIO_AI_時報
         {
             if(CurrentMode == Mode.Run)
             {
-                rootLevel.OnRun();
+                rootLevel?.OnRun();
             }
+            GUI_Components.voiceOutput.EveryTick();
         }
 
         void OnModeChangeButtonClicked()
@@ -99,6 +91,36 @@ namespace CeVIO_AI_時報
         {
             XElement element = rootLevel.StoreToXML();
             element.Save("config.txt");
+        }
+        void LoadData()
+        {
+            if(rootLevel != null)
+            {
+                var answer = MessageBox.Show("保存しますか？", "読み込み", MessageBoxButtons.YesNoCancel);
+                if (answer == DialogResult.Yes)
+                {
+                    SaveToFile();
+                }
+                if(answer == DialogResult.Cancel)
+                {
+                    return;
+                }
+            }
+            if (File.Exists("config.txt"))
+            {
+                try
+                {
+                    rootLevel = new RootLevel(XElement.Load("config.txt"));
+                }
+                catch (XmlException)
+                {
+                    rootLevel = new RootLevel();
+                }
+            }
+            else
+            {
+                rootLevel = new RootLevel();
+            }
         }
         void AskSave()
         {

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Root>
+  <Type>Root</Type>
+  <TimeConditions>
+    <TimeCondition>
+      <Name>New</Name>
+      <Type>Time</Type>
+      <DayOfWeeks>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+        <DayOfWeek>true</DayOfWeek>
+      </DayOfWeeks>
+      <StartTime>639133632000000000</StartTime>
+      <EndTime>639134495990000000</EndTime>
+      <Interval>60</Interval>
+      <RandomSelect>
+        <Type>Random</Type>
+        <Selections>
+          <TalkContent>
+            <Name>New</Name>
+            <Type>Read</Type>
+            <VoiceProperties>
+              <Volume>50</Volume>
+              <Speed>50</Speed>
+              <Tone>50</Tone>
+              <Alpha>50</Alpha>
+              <ToneScale>50</ToneScale>
+            </VoiceProperties>
+            <Emotions>
+              <Emotion0>0</Emotion0>
+              <Emotion1>0</Emotion1>
+              <Emotion2>0</Emotion2>
+              <Emotion3>0</Emotion3>
+              <Emotion4>0</Emotion4>
+            </Emotions>
+            <Cast>すずきつづみ</Cast>
+            <Content>こんにちは！今は{月}月{日}日{時}時{分}分です。</Content>
+          </TalkContent>
+        </Selections>
+      </RandomSelect>
+    </TimeCondition>
+  </TimeConditions>
+</Root>

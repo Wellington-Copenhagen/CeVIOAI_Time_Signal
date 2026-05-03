@@ -46,6 +46,7 @@ namespace CeVIO_AI_時報.UI_Component
         }
         public void SetValue(VoiceProperty value)
         {
+            Enable();
             _value = value;
             _valueLabel.Text = _value.ValueString();
             _nameLabel.Text = _value.NameJa();

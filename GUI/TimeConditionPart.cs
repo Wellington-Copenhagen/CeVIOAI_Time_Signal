@@ -21,24 +21,24 @@ namespace CeVIO_AI_時報.GUI
         public GUI_TimeConditionPart()
         {
             _dayOfWeekCheckBoxes = new List<CheckBox>();
-            List<string> dayOfWeekNames = new List<string>() { "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日" };
+            List<string> dayOfWeekNames = new List<string>() { "日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日" };
             for (int i = 0; i < 7; i++)
             {
                 _dayOfWeekCheckBoxes.Add(new CheckBox());
                 _dayOfWeekCheckBoxes.Last().Location = new Point(10, 20 + 20 * i);
                 _dayOfWeekCheckBoxes.Last().Size = new Size(60, 16);
                 _dayOfWeekCheckBoxes.Last().Text = dayOfWeekNames[i];
-                _dayOfWeekCheckBoxes.Last().CheckedChanged += (sender, e) => OnChangedByUser?.Invoke();
+                _dayOfWeekCheckBoxes.Last().CheckedChanged += OnValueChanged;
                 Controls.Add(_dayOfWeekCheckBoxes.Last());
             }
             _timeSelectorStart = new TimeSelector("から");
             _timeSelectorStart.Location = new Point(10, 160);
-            _timeSelectorStart.OnValueChanged += () => OnChangedByUser?.Invoke();
+            _timeSelectorStart.ValueChanged += OnValueChanged;
             Controls.Add(_timeSelectorStart);
 
             _timeSelectorEnd = new TimeSelector("まで");
             _timeSelectorEnd.Location = new Point(10, 200);
-            _timeSelectorEnd.OnValueChanged += () => OnChangedByUser?.Invoke();
+            _timeSelectorEnd.ValueChanged += OnValueChanged;
             Controls.Add( _timeSelectorEnd);
 
             _intervalNumericUpDown = new NumericUpDown();
@@ -46,7 +46,7 @@ namespace CeVIO_AI_時報.GUI
             _intervalNumericUpDown.Size = new Size(60, 20);
             _intervalNumericUpDown.Minimum = 1;
             _intervalNumericUpDown.Maximum = 1440;
-            _intervalNumericUpDown.ValueChanged += (sender, e) => OnChangedByUser?.Invoke();
+            _intervalNumericUpDown.ValueChanged += OnValueChanged;
             Controls.Add(_intervalNumericUpDown);
 
             _intervalLabel = new Label();
@@ -73,15 +73,7 @@ namespace CeVIO_AI_時報.GUI
             }
             return dayOfWeeks;
         }
-        protected override void UpdateVisual()
-        {
-            SetDayOfWeeks(_timeCondition.DayOfWeeks);
-            _timeSelectorStart.SetTime(_timeCondition.StartTime);
-            _timeSelectorEnd.SetTime(_timeCondition.EndTime);
-            _intervalNumericUpDown.Value = _timeCondition.Interval;
-            GUI_Components.randomSelectPart.SetProcessUnit(_timeCondition.BindingRandomSelect);
-        }
-        protected override void UpdateValue()
+        public override void UpdateValue()
         {
             if(_timeCondition != null)
             {
@@ -90,10 +82,6 @@ namespace CeVIO_AI_時報.GUI
                 _timeCondition.EndTime = _timeSelectorEnd.GetTime();
                 _timeCondition.Interval = (int)_intervalNumericUpDown.Value;
             }
-        }
-        protected override void InitWithCeVIO()
-        {
-
         }
         public override void Disable()
         {
@@ -104,10 +92,11 @@ namespace CeVIO_AI_時報.GUI
             }
             _timeSelectorStart?.Disable();
             _timeSelectorEnd?.Disable();
-            if (_intervalNumericUpDown != null) _intervalNumericUpDown.Enabled = false;
-            if (_intervalLabel != null) _intervalLabel.Enabled = false;
+            _intervalNumericUpDown.Enabled = false;
+            _intervalLabel.Enabled = false;
+            GUI_Components.randomSelectPart.SetProcessUnit(null);
         }
-        protected override void Enable()
+        public override void Enable()
         {
             Enabled = true;
             foreach (CheckBox checkBox in _dayOfWeekCheckBoxes)
@@ -118,6 +107,12 @@ namespace CeVIO_AI_時報.GUI
             _timeSelectorEnd.Enable();
             _intervalNumericUpDown.Enabled = true;
             _intervalLabel.Enabled = true;
+
+            SetDayOfWeeks(_timeCondition.DayOfWeeks);
+            _timeSelectorStart.SetTime(_timeCondition.StartTime);
+            _timeSelectorEnd.SetTime(_timeCondition.EndTime);
+            _intervalNumericUpDown.Value = _timeCondition.Interval;
+            GUI_Components.randomSelectPart.SetProcessUnit(_timeCondition.BindingRandomSelect);
         }
         public void SetProcessUnit(TimeCondition timeCondition)
         {
@@ -126,8 +121,9 @@ namespace CeVIO_AI_時報.GUI
                 return;
             }
             _timeCondition = timeCondition;
+            UpdateUI(true);
         }
-        protected override bool HasBindingProcessUnit()
+        public override bool HasBindingProcessUnit()
         {
             return _timeCondition != null;
         }

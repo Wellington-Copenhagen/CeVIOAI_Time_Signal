@@ -59,6 +59,7 @@ namespace CeVIO_AI_時報.ProcessUnit
             {
                 return;
             }
+            TimeConditions.Clear();
             if (element.Element("TimeConditions") != null)
             {
                 foreach (XElement timeCondition in element.Element("TimeConditions").Elements())
@@ -70,6 +71,7 @@ namespace CeVIO_AI_時報.ProcessUnit
         public void Default()
         {
             TimeConditions = new List<TimeCondition>();
+            TimeConditions.Add(new TimeCondition());
         }
     }
 }

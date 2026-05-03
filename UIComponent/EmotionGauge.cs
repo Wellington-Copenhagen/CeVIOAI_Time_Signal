@@ -41,10 +41,12 @@ namespace CeVIO_AI_時報.UI_Component
         }
         public void SetName(string name)
         {
+            Enable();
             _emotionNameLabel.Text = name;
         }
         public void SetValue(uint value)
         {
+            Enable();
             _trackBar.ValueChanged -= OnGaugeMove;
             _trackBar.Value = (int)value;
             _emotionValueLabel.Text = value.ToString();
@@ -66,6 +68,8 @@ namespace CeVIO_AI_時報.UI_Component
         }
         public override void Disable()
         {
+            _emotionNameLabel.Text = "";
+            _emotionValueLabel.Text = "";
             _trackBar.Enabled = false;
             _emotionNameLabel.Enabled = false;
             _emotionValueLabel.Enabled = false;

@@ -18,6 +18,7 @@ namespace CeVIO_AI_時報.GUI
 
         static public Button modeChangeButton;
         static public Button saveButton;
+        static public Button loadButton;
 
         static public GUI_RootPart rootPart;
         static public GUI_TimeConditionPart timeConditionPart;
@@ -88,50 +89,77 @@ namespace CeVIO_AI_時報.GUI
             modeChangeButton.Size = new Size(80, 20);
             TopBar.Controls.Add(modeChangeButton);
 
-            rootPart.OnChanged = () => UpdateVisual();
-            timeConditionPart.OnChanged = () => UpdateVisual();
-            randomSelectPart.OnChanged = () => UpdateVisual();
-            talkContentPart.OnChanged = () => UpdateVisual();
+            loadButton = new Button();
+            loadButton.Text = "読み込む";
+            loadButton.Location = new Point(175, 5);
+            loadButton.Size = new Size(80, 20);
+            TopBar.Controls.Add(loadButton);
+
+            //rootPart.ValueChanged = () => UpdateVisual();
+            //timeConditionPart.ValueChanged= () => UpdateVisual();
+            //randomSelectPart.ValueChanged = () => UpdateVisual();
+            //talkContentPart.ValueChanged = () => UpdateVisual();
         }
         static public void OnCeVIOLoaded()
         {
             CeVIOLoaded = true;
-            rootPart.OnCeVIOLoaded();
-            timeConditionPart.OnCeVIOLoaded();
-            randomSelectPart.OnCeVIOLoaded();
-            talkContentPart.OnCeVIOLoaded();
+            rootPart.InitWithCeVIO();
+            timeConditionPart.InitWithCeVIO();
+            randomSelectPart.InitWithCeVIO();
+            talkContentPart.InitWithCeVIO();
+
+            UpdateVisual();
         }
         static public void OnDataLoaded()
         {
             DataLoaded = true;
+
+            UpdateVisual();
         }
         static public void UpdateVisual()
         {
-            if (UnderOnValueChanged)
-            {
-                return;
-            }
-            if (CeVIOLoaded && DataLoaded && CurrentMode == Form1.Mode.Edit)
-            {
-                UnderOnValueChanged = true;
-                rootPart.UpdateUI();
-                timeConditionPart.UpdateUI();
-                randomSelectPart.UpdateUI();
-                talkContentPart.UpdateUI();
-                UnderOnValueChanged = false;
-            }
-            else
-            {
-                rootPart.Disable();
-                timeConditionPart.Disable();
-                randomSelectPart.Disable();
-                talkContentPart.Disable();
-            }
+            rootPart.UpdateUI(CeVIOLoaded && DataLoaded && CurrentMode == Form1.Mode.Edit);
+            timeConditionPart.UpdateUI(CeVIOLoaded && DataLoaded && CurrentMode == Form1.Mode.Edit);
+            randomSelectPart.UpdateUI(CeVIOLoaded && DataLoaded && CurrentMode == Form1.Mode.Edit);
+            talkContentPart.UpdateUI(CeVIOLoaded && DataLoaded && CurrentMode == Form1.Mode.Edit);
         }
         static public void OnModeChanged(Form1.Mode mode)
         {
             CurrentMode = mode;
             UpdateVisual();
+            if(CurrentMode == Form1.Mode.Edit)
+            {
+                saveButton.Enabled = true;
+                loadButton.Enabled = true;
+            }
+            else
+            {
+                saveButton.Enabled = false;
+                loadButton.Enabled = false;
+            }
+        }
+        static public void StartHost()
+        {
+            if (!ServiceControl2.IsHostStarted)
+            {
+                Form popup = new Form();
+                popup.Size = new Size(600,0);
+                popup.Text = "CeVIO AIトークエディターを起動中です。";
+
+                popup.Show();
+                HostStartResult startResult = ServiceControl2.StartHost(false);
+                popup.Close();
+                if (startResult != HostStartResult.Succeeded)
+                {
+                    MessageBox.Show("CeVIOトークエディタが起動できませんでした。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Environment.Exit(0);
+                }
+                if (Talker2.AvailableCasts.Count() == 0)
+                {
+                    MessageBox.Show("利用可能なキャストがいませんでした。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Environment.Exit(0);
+                }
+            }
         }
     }
 }

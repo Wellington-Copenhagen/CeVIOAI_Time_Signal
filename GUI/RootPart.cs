@@ -19,15 +19,29 @@ namespace CeVIO_AI_時報.GUI
         {
             listBox = new ListBoxAddDeletable<TimeCondition>();
             listBox.Location = new Point(10, 20);
-            listBox.OnChanged = () => OnChangedByUser?.Invoke();
+            listBox.ValueChanged = OnValueChanged;
             Controls.Add(listBox);
 
             Disable();
         }
-        protected override void UpdateVisual()
+        public override void UpdateValue()
         {
-            listBox.SetComponents(_rootLevel.TimeConditions);
-            if (listBox.GetComponents().Count != 0 && listBox.SelectedIndex >= 0)
+            _rootLevel.TimeConditions = listBox.Components;
+        }
+        public override void Disable()
+        {
+            listBox.Disable();
+            Enabled = false;
+
+            GUI_Components.timeConditionPart.SetProcessUnit(null);
+        }
+        public override void Enable()
+        {
+            listBox.Enable();
+            Enabled = true;
+
+            listBox.Components = _rootLevel.TimeConditions;
+            if (listBox.Components.Count != 0 && listBox.SelectedIndex >= 0)
             {
                 GUI_Components.timeConditionPart.SetProcessUnit(_rootLevel.TimeConditions[listBox.SelectedIndex]);
             }
@@ -35,23 +49,6 @@ namespace CeVIO_AI_時報.GUI
             {
                 GUI_Components.timeConditionPart.SetProcessUnit(null);
             }
-        }
-        protected override void UpdateValue()
-        {
-            _rootLevel.TimeConditions = listBox.GetComponents();
-        }
-        protected override void InitWithCeVIO()
-        {
-        }
-        public override void Disable()
-        {
-            listBox?.Disable();
-            Enabled = false;
-        }
-        protected override void Enable()
-        {
-            listBox.Enable();
-            Enabled = true;
         }
         public void SetProcessUnit(RootLevel rootLevel)
         {
@@ -70,8 +67,9 @@ namespace CeVIO_AI_時報.GUI
                 GUI_Components.timeConditionPart.SetProcessUnit(null);
                 listBox.SelectedIndex = -1;
             }
+            UpdateUI(true);
         }
-        protected override bool HasBindingProcessUnit()
+        public override bool HasBindingProcessUnit()
         {
             return _rootLevel != null;
         }

@@ -22,13 +22,29 @@ namespace CeVIO_AI_時報.GUI
             _talkContentListBox.Location = new Point(10, 20);
             Controls.Add(_talkContentListBox);
 
-            _talkContentListBox.OnChanged = () => OnChangedByUser?.Invoke();
+            _talkContentListBox.ValueChanged = OnValueChanged;
 
             Disable();
         }
-        protected override void UpdateVisual()
+        public override void UpdateValue()
         {
-            _talkContentListBox.SetComponents(_randomSelect.Contents);
+            if(_randomSelect != null)
+            {
+                _talkContentListBox.Components = _randomSelect.Contents;
+            }
+        }
+        public override void Disable()
+        {
+            Enabled = false;
+            _talkContentListBox?.Disable();
+            _talkContentListBox.Components = new List<TalkContent>();
+        }
+        public override void Enable()
+        {
+            Enabled = true;
+            _talkContentListBox.Enable();
+
+            _talkContentListBox.Components = _randomSelect.Contents;
             if (_randomSelect.Contents.Count != 0 && _talkContentListBox.SelectedIndex >= 0)
             {
                 GUI_Components.talkContentPart.SetProcessUnit(_randomSelect.Contents[_talkContentListBox.SelectedIndex]);
@@ -37,28 +53,6 @@ namespace CeVIO_AI_時報.GUI
             {
                 GUI_Components.talkContentPart.SetProcessUnit(null);
             }
-        }
-        protected override void UpdateValue()
-        {
-            if(_randomSelect != null)
-            {
-                _talkContentListBox.SetComponents(_randomSelect.Contents);
-            }
-        }
-        protected override void InitWithCeVIO()
-        {
-
-        }
-        public override void Disable()
-        {
-            Enabled = false;
-            _talkContentListBox?.Disable();
-            _talkContentListBox.SetComponents(new List<TalkContent>());
-        }
-        protected override void Enable()
-        {
-            Enabled = true;
-            _talkContentListBox.Enable();
         }
         public void SetProcessUnit(RandomSelect randomSelect)
         {
@@ -77,8 +71,9 @@ namespace CeVIO_AI_時報.GUI
                 GUI_Components.talkContentPart.SetProcessUnit(null);
                 _talkContentListBox.SelectedIndex = -1;
             }
+            UpdateUI(true);
         }
-        protected override bool HasBindingProcessUnit()
+        public override bool HasBindingProcessUnit()
         {
             return _randomSelect != null;
         }

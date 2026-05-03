@@ -83,16 +83,19 @@
     <Compile Include="ProcessUnit\TalkContent.cs" />
     <Compile Include="ProcessUnit\TimeCondition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI_Component\EmotionGauge.cs">
+    <Compile Include="UIComponent\EmotionGauge.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI_Component\ListBoxAddDeletable.cs">
+    <Compile Include="UIComponent\ListBoxAddDeletable.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI_Component\TimeSelector.cs">
+    <Compile Include="UIComponent\TimeSelector.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI_Component\VoicePropertyGauge.cs">
+    <Compile Include="UIComponent\UIComponent.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UIComponent\VoicePropertyGauge.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="VoiceProperty.cs" />
